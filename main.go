@@ -2,19 +2,28 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/sys/unix"
 	"net"
 	"sync"
 )
 
 func main() {
+	tun, err := createTUN("tun0")
+	if err != nil {
+		panic(err)
+	}
+	defer tun.Close()
+
 	localAddr, err := net.ResolveUDPAddr("udp", ":43000")
 	if err != nil {
 		panic(err)
 	}
+
 	remoteAddr, err := net.ResolveUDPAddr("udp", "153.127.195.10:43000")
 	if err != nil {
 		panic(err)
 	}
+
 	conn, err := net.ListenUDP("udp", localAddr)
 	if err != nil {
 		panic(err)
@@ -25,7 +34,7 @@ func main() {
 
 	wg.Add(1)
 	go func() {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 1500)
 		for {
 			n, addr, err := conn.ReadFromUDP(buf)
 			if err != nil {
@@ -33,24 +42,42 @@ func main() {
 				continue
 			}
 			fmt.Printf("Received %d bytes from %s: %s\n", n, addr, string(buf[:n]))
+			tun.Write(buf[:n])
 		}
 	}()
 
 	wg.Add(1)
 	go func() {
+		buf := make([]byte, 1500)
 		for {
-			var input string
-			fmt.Print("送信するメッセージを入力: ")
-			_, err := fmt.Scanln(&input)
+			pollFds := []unix.PollFd{
+				{Fd: int32(tun.Fd()), Events: unix.POLLIN},
+			}
+			n, err := unix.Poll(pollFds, 500)
 			if err != nil {
-				fmt.Println("入力エラー:", err)
+				fmt.Printf("Error polling: %v\n", err)
 				continue
 			}
-			_, err = conn.WriteToUDP([]byte(input), remoteAddr)
-			if err != nil {
-				fmt.Println("送信中にエラー:", err)
-			} else {
-				fmt.Println("送信完了！")
+			if n == 0 {
+				continue
+			}
+
+			if (pollFds[0].Revents & unix.POLLIN) != 0 {
+				n, err := tun.Read(buf)
+				if err != nil {
+					if err == unix.EAGAIN || err == unix.EWOULDBLOCK {
+					} else {
+						fmt.Printf("Error reading from TUN: %v\n", err)
+					}
+					continue
+				}
+				if n > 0 {
+					_, err = conn.WriteToUDP(buf[:n], remoteAddr)
+					if err != nil {
+						fmt.Println("Error sending to UDP:", err)
+						continue
+					}
+				}
 			}
 		}
 	}()
