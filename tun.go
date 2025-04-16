@@ -14,7 +14,6 @@ func createTUN(ifname string, flags uint16) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer fd.Close()
 
 	ifr, err := unix.NewIfreq(ifname)
 	if err != nil {
