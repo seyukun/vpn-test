@@ -8,11 +8,16 @@ import (
 )
 
 func main() {
-	tun, err := createTUN("tun0")
+	tun, err := createTUN("tun0", unix.IFF_TAP|unix.IFF_MULTI_QUEUE|unix.IFF_NAPI, 1500)
 	if err != nil {
 		panic(err)
 	}
 	defer tun.Close()
+
+	err = unix.SetNonblock(int(tun.Fd()), true)
+	if err != nil {
+		panic(err)
+	}
 
 	localAddr, err := net.ResolveUDPAddr("udp", ":43000")
 	if err != nil {
