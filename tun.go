@@ -8,7 +8,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func createTUN(ifname string, flags uint16, mtu uint32) (*os.File, error) {
+func createTUN(ifname string, flags uint16) (*os.File, error) {
 	cloneSrc := "/dev/net/tun"
 	fd, err := os.OpenFile(cloneSrc, os.O_RDWR, 0)
 	if err != nil {
@@ -21,7 +21,6 @@ func createTUN(ifname string, flags uint16, mtu uint32) (*os.File, error) {
 		return nil, err
 	}
 	ifr.SetUint16(flags)
-	ifr.SetUint32(mtu)
 
 	_, _, errno := unix.Syscall(unix.SYS_IOCTL, fd.Fd(), uintptr(unix.TUNSETIFF), uintptr(unsafe.Pointer(ifr)))
 	if errno != 0 {

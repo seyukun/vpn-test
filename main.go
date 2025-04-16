@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	tun, err := createTUN("tun0", unix.IFF_MULTI_QUEUE|unix.IFF_NAPI, 1500)
+	tun, err := createTUN("tun0", unix.IFF_MULTI_QUEUE|unix.IFF_NAPI)
 	if err != nil {
 		panic(err)
 	}
