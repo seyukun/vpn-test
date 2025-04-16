@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"sync"
 )
 
 func main() {
@@ -20,6 +21,9 @@ func main() {
 	}
 	defer conn.Close()
 
+	wg := &sync.WaitGroup{}
+
+	wg.Add(1)
 	go func() {
 		buf := make([]byte, 1024)
 		for {
@@ -32,6 +36,7 @@ func main() {
 		}
 	}()
 
+	wg.Add(1)
 	go func() {
 		for {
 			var input string
@@ -49,4 +54,7 @@ func main() {
 			}
 		}
 	}()
+
+	wg.Wait()
+	fmt.Println("全てのゴルーチンが終了しました。")
 }
