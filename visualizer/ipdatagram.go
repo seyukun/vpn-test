@@ -339,7 +339,8 @@ func IPDatagramV4(buf []byte) (string, error) {
 	// Protocol
 	protocol, _ := IPDatagramProtocol(buf[9])
 
-	output := fmt.Sprintf(`┌────┬────┬─────────┬───────────────────┐
+	output := fmt.Sprintf(`
+\r┌────┬────┬─────────┬───────────────────┐
 │v%-3d│%-4d│%08b │%-19d│
 ├────┴────┴─────────┼───────────────────┤
 │%-19d│%016b   │
@@ -374,7 +375,8 @@ func IPDatagramV6(buf []byte) (string, error) {
 	// Hop Limit
 	hopLimit := int(buf[7])
 
-	output := fmt.Sprintf(`┌────┬─────────┬────────────────────────┐
+	output := fmt.Sprintf(`
+\r┌────┬─────────┬────────────────────────┐
 │v%-3d│%08b │%020d    │
 ├────┴─────────┴────┬─────────┬─────────┤
 │%-19d│%-9s|%-9d│
