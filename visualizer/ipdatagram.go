@@ -114,9 +114,9 @@ func IPDatagramV6(buf []byte) (string, error) {
 	// Hop Limit
 	hopLimit := int(buf[7])
 
-	output := fmt.Sprintf("┌────┬────┬─────────────────────────────┐\n")
+	output := fmt.Sprintf("┌────┬─────────┬────────────────────────┐\n")
 	output += fmt.Sprintf("│v%-3d│%08b │%020d    │\n", version, trafficClass, flowLavel)
-	output += fmt.Sprintf("├────┴────┴─────────┬─────────┬─────────┤\n")
+	output += fmt.Sprintf("├────┴─────────┴────┬─────────┬─────────┤\n")
 	output += fmt.Sprintf("│%-19d│%-9s|%-9d│\n", payloadLength, nextHaeder, hopLimit)
 	output += fmt.Sprintf("├───────────────────┴─────────┴─────────┤\n")
 	output += fmt.Sprintf("│%-39s│\n", net.IP(buf[8:24]))
