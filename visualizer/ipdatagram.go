@@ -60,6 +60,6 @@ func IpDatagram(buf []byte) {
 	fmt.Printf("TTL: %d\n", buf[8])
 	fmt.Printf("Protocol: %s\n", protocol)
 	fmt.Printf("Header Checksum: %d\n", headerChecksum)
-	fmt.Printf("SRC IP: %d.%d.%d.%d\n", buf[12], buf[13], buf[14], buf[15])
+	fmt.Printf("SRC IP: %d.%d.%d.%d\n", int(buf[12]), int(buf[13]), int(buf[14]), int(buf[15]))
 	fmt.Printf("DST IP: %d.%d.%d.%d\n", buf[16], buf[17], buf[18], buf[19])
 }
