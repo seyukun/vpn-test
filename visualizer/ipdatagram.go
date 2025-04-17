@@ -378,7 +378,7 @@ func IPDatagramV6(buf []byte) (string, error) {
 	payloadLength := uint16(buf[4])<<8 | uint16(buf[5])
 
 	// Next Header
-	nextHeader, _ := IPDatagramProtocol(buf[9])
+	nextHeader, _ := IPDatagramProtocol(buf[6])
 
 	// Hop Limit
 	hopLimit := int(buf[7])
