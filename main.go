@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	tun, err := createTUN("tun0", unix.IFF_TUN|unix.IFF_MULTI_QUEUE|unix.IFF_NAPI)
+	tun, err := createTUN("tun0", unix.IFF_TUN|unix.IFF_MULTI_QUEUE|unix.IFF_NAPI|unix.IFF_NO_PI)
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +79,7 @@ func main() {
 					continue
 				}
 				if n > 0 {
-					visualizer.IpDatagram(buf)
+					visualizer.IpDatagram(buf[:n])
 					_, err = conn.WriteToUDP(buf[:n], remoteAddr)
 					if err != nil {
 						fmt.Println("Error sending to UDP:", err)
