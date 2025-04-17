@@ -43,7 +43,7 @@ func main() {
 	go func() {
 		buf := make([]byte, 1500)
 		for {
-			n, addr, err := conn.ReadFromUDP(buf)
+			n, _, err := conn.ReadFromUDP(buf)
 			if err != nil {
 				fmt.Println("Error reading from UDP:", err)
 				continue
