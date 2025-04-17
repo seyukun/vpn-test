@@ -137,12 +137,8 @@ func IPDatagramProtocol(protocolNumber uint8) (string, error) {
 		protocol = "IPv6-NoNxt"
 	case 60:
 		protocol = "IPv6-Opts"
-	case 61:
-		protocol = ""
 	case 62:
 		protocol = "CFTP"
-	case 63:
-		protocol = ""
 	case 64:
 		protocol = "SAT-EXPAK"
 	case 65:
@@ -151,8 +147,6 @@ func IPDatagramProtocol(protocolNumber uint8) (string, error) {
 		protocol = "RVD"
 	case 67:
 		protocol = "IPPC"
-	case 68:
-		protocol = ""
 	case 69:
 		protocol = "SAT-MON"
 	case 70:
@@ -213,8 +207,6 @@ func IPDatagramProtocol(protocolNumber uint8) (string, error) {
 		protocol = "ETHERIP"
 	case 98:
 		protocol = "ENCAP"
-	case 99:
-		protocol = ""
 	case 100:
 		protocol = "GMTP"
 	case 101:
@@ -243,8 +235,6 @@ func IPDatagramProtocol(protocolNumber uint8) (string, error) {
 		protocol = "VRRP"
 	case 113:
 		protocol = "PGM"
-	case 114:
-		protocol = ""
 	case 115:
 		protocol = "L2TP"
 	case 116:
@@ -349,17 +339,20 @@ func IPDatagramV4(buf []byte) (string, error) {
 	// Protocol
 	protocol, _ := IPDatagramProtocol(buf[9])
 
-	output := fmt.Sprintf("┌────┬────┬─────────┬───────────────────┐\n")
-	output += fmt.Sprintf("│v%-3d│%-4d│%08b │%-19d│\n", version, ihl, buf[1], totalLength)
-	output += fmt.Sprintf("├────┴────┴─────────┼───────────────────┤\n")
-	output += fmt.Sprintf("│%-19d│%016b   │\n", identification, uint16(buf[6])<<8|uint16(buf[7]))
-	output += fmt.Sprintf("├─────────┬─────────┼───────────────────┤\n")
-	output += fmt.Sprintf("│%08b │%-9s│%-19d│\n", buf[8], protocol, headerChecksum)
-	output += fmt.Sprintf("├─────────┴─────────┴───────────────────┤\n")
-	output += fmt.Sprintf("│%-39s│\n", fmt.Sprintf("%d.%d.%d.%d", buf[12], buf[13], buf[14], buf[15]))
-	output += fmt.Sprintf("├───────────────────────────────────────┤\n")
-	output += fmt.Sprintf("│%-39s│\n", fmt.Sprintf("%d.%d.%d.%d", buf[16], buf[17], buf[18], buf[19]))
-	output += fmt.Sprintf("└───────────────────────────────────────┘\n")
+	output := fmt.Sprintf(`
+┌────┬────┬─────────┬───────────────────┐
+│v%-3d│%-4d│%08b │%-19d│
+├────┴────┴─────────┼───────────────────┤
+│%-19d│%016b   │
+├─────────┬─────────┼───────────────────┤
+│%08b │%-9s│%-19d│
+├─────────┴─────────┴───────────────────┤
+│%-39s│
+├───────────────────────────────────────┤
+│%-39s│
+└───────────────────────────────────────┘
+`, version, ihl, buf[1], totalLength, identification, uint16(buf[6])<<8|uint16(buf[7]), buf[8], protocol, headerChecksum, fmt.Sprintf("%d.%d.%d.%d", buf[12], buf[13], buf[14], buf[15]), fmt.Sprintf("%d.%d.%d.%d", buf[16], buf[17], buf[18], buf[19]))
+
 	return output, nil
 }
 
@@ -383,15 +376,17 @@ func IPDatagramV6(buf []byte) (string, error) {
 	// Hop Limit
 	hopLimit := int(buf[7])
 
-	output := fmt.Sprintf("┌────┬─────────┬────────────────────────┐\n")
-	output += fmt.Sprintf("│v%-3d│%08b │%020d    │\n", version, trafficClass, flowLavel)
-	output += fmt.Sprintf("├────┴─────────┴────┬─────────┬─────────┤\n")
-	output += fmt.Sprintf("│%-19d│%-9s|%-9d│\n", payloadLength, nextHeader, hopLimit)
-	output += fmt.Sprintf("├───────────────────┴─────────┴─────────┤\n")
-	output += fmt.Sprintf("│%-39s│\n", net.IP(buf[8:24]))
-	output += fmt.Sprintf("├───────────────────────────────────────┤\n")
-	output += fmt.Sprintf("│%-39s│\n", net.IP(buf[24:40]))
-	output += fmt.Sprintf("└───────────────────────────────────────┘\n")
+	output := fmt.Sprintf(`
+┌────┬─────────┬────────────────────────┐
+│v%-3d│%08b │%020d    │
+├────┴─────────┴────┬─────────┬─────────┤
+│%-19d│%-9s|%-9d│
+├───────────────────┴─────────┴─────────┤
+│%-39s│
+├───────────────────────────────────────┤
+│%-39s│
+└───────────────────────────────────────┘
+`, version, trafficClass, flowLavel, payloadLength, nextHeader, hopLimit, net.IP(buf[8:24]), net.IP(buf[24:40]))
 
 	return output, nil
 }
