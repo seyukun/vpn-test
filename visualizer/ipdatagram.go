@@ -58,16 +58,6 @@ func IPDatagramV4(buf []byte) (string, error) {
 		protocol = "AH"
 	}
 
-	// Print the source and destination IP addresses
-	// fmt.Printf("VERSION: %d\n", version)
-	// fmt.Printf("IHL: %d\n", ihl)
-	// fmt.Printf("Total Length: %d\n", totalLength)
-	// fmt.Printf("Identification: %d\n", identification)
-	// fmt.Printf("TTL: %d\n", buf[8])
-	// fmt.Printf("Protocol: %s\n", protocol)
-	// fmt.Printf("Header Checksum: %d\n", headerChecksum)
-	// fmt.Printf("SRC IP: %d.%d.%d.%d\n", buf[12], buf[13], buf[14], buf[15])
-	// fmt.Printf("DST IP: %d.%d.%d.%d\n", buf[16], buf[17], buf[18], buf[19])
 	output := fmt.Sprintf("┌────┬────┬─────────┬───────────────────┐\n")
 	output += fmt.Sprintf("│v%-3d│%-4d│%08b │%-19d│\n", version, ihl, buf[1], totalLength)
 	output += fmt.Sprintf("├────┴────┴─────────┼───────────────────┤\n")
@@ -75,9 +65,9 @@ func IPDatagramV4(buf []byte) (string, error) {
 	output += fmt.Sprintf("├─────────┬─────────┼───────────────────┤\n")
 	output += fmt.Sprintf("│%08b │%-9s│%-19d│\n", buf[8], protocol, headerChecksum)
 	output += fmt.Sprintf("├─────────┴─────────┴───────────────────┤\n")
-	output += fmt.Sprintf("│src ip                                 │\n")
+	output += fmt.Sprintf("│%-39s│\n", fmt.Sprintf("%d.%d.%d.%d", buf[12], buf[13], buf[14], buf[15]))
 	output += fmt.Sprintf("├───────────────────────────────────────┤\n")
-	output += fmt.Sprintf("│dst ip                                 │\n")
+	output += fmt.Sprintf("│%-39s│\n", fmt.Sprintf("%d.%d.%d.%d", buf[16], buf[17], buf[18], buf[19]))
 	output += fmt.Sprintf("└───────────────────────────────────────┘\n")
 	return output, nil
 }
