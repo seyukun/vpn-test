@@ -1,6 +1,9 @@
 package visualizer
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+)
 
 func IPDatagramVersion(buf []byte) (uint8, error) {
 	if len(buf) < 20 {
@@ -72,6 +75,58 @@ func IPDatagramV4(buf []byte) (string, error) {
 	return output, nil
 }
 
+func IPDatagramV6(buf []byte) (string, error) {
+	// Version
+	version, err := IPDatagramVersion(buf)
+	if err != nil {
+		return "", err
+	}
+
+	// Extract the Traffic Class and Flow Label
+	trafficClass := (buf[0]&0b00001111)<<4 | (buf[1]&0b11110000)>>4
+	flowLavel := (uint32(buf[1]&0b00001111)<<16 | uint32(buf[2])<<8 | uint32(buf[3]))
+
+	// Payload Length
+	payloadLength := uint16(buf[4])<<8 | uint16(buf[5])
+
+	// Next Header
+	nextHaederNumber := int(buf[6])
+	nextHaeder := "Unknown"
+	switch nextHaederNumber {
+	case 0:
+		nextHaeder = "Reserved"
+	case 1:
+		nextHaeder = "ICMP"
+	case 2:
+		nextHaeder = "IGMP"
+	case 6:
+		nextHaeder = "TCP"
+	case 8:
+		nextHaeder = "EGP"
+	case 17:
+		nextHaeder = "UDP"
+	case 50:
+		nextHaeder = "ESP"
+	case 51:
+		nextHaeder = "AH"
+	}
+
+	// Hop Limit
+	hopLimit := int(buf[7])
+
+	output := fmt.Sprintf("┌────┬────┬─────────┬───────────────────┐\n")
+	output += fmt.Sprintf("│v%-3d│%08b │%020d    │\n", version, trafficClass, flowLavel)
+	output += fmt.Sprintf("├────┴────┴─────────┼─────────┬─────────┤\n")
+	output += fmt.Sprintf("│%-19d│%-9s|%-9d│\n", payloadLength, nextHaeder, hopLimit)
+	output += fmt.Sprintf("├───────────────────┴─────────┴─────────┤\n")
+	output += fmt.Sprintf("│%-39s│\n", net.IP(buf[8:24]))
+	output += fmt.Sprintf("├───────────────────────────────────────┤\n")
+	output += fmt.Sprintf("│%-39s│\n", net.IP(buf[24:40]))
+	output += fmt.Sprintf("└───────────────────────────────────────┘\n")
+
+	return output, nil
+}
+
 func IPDatagram(buf []byte) {
 	// Version
 	version, err := IPDatagramVersion(buf)
@@ -86,6 +141,18 @@ func IPDatagram(buf []byte) {
 			return
 		}
 		fmt.Println(output)
+
+	case 6:
+		if len(buf) < 40 {
+			fmt.Println("Header too small for IPv6")
+			return
+		}
+		output, err := IPDatagramV6(buf)
+		if err != nil {
+			return
+		}
+		fmt.Println(output)
+
 	default:
 		fmt.Println("Unsupported IP version:", version)
 	}
