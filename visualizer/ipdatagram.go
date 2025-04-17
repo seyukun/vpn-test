@@ -3,7 +3,21 @@ package visualizer
 import (
 	"fmt"
 	"net"
+	"strings"
 )
+
+func centerString(s string, width int) string {
+	if len(s) >= width {
+		return s
+	}
+	totalPadding := width - len(s)
+	if totalPadding < 0 {
+		totalPadding = 0
+	}
+	leftPadding := totalPadding / 2
+	rightPadding := totalPadding - leftPadding
+	return strings.Repeat(" ", leftPadding) + s + strings.Repeat(" ", rightPadding)
+}
 
 func IPDatagramVersion(buf []byte) (uint8, error) {
 	if len(buf) < 20 {
@@ -341,16 +355,27 @@ func IPDatagramV4(buf []byte) (string, error) {
 
 	output := fmt.Sprintf(`
 ┌────┬────┬─────────┬───────────────────┐
-│v%-3d│%-4d│%08b │%-19d│
+│%s│%s│%s│%s│
 ├────┴────┴─────────┼───────────────────┤
-│%-19d│%016b   │
+│%s│%s│
 ├─────────┬─────────┼───────────────────┤
-│%08b │%-9s│%-19d│
+│%s│%-9s│%s│
 ├─────────┴─────────┴───────────────────┤
-│%-39s│
+│%s│
 ├───────────────────────────────────────┤
-│%-39s│
-└───────────────────────────────────────┘`, version, ihl, buf[1], totalLength, identification, uint16(buf[6])<<8|uint16(buf[7]), buf[8], protocol, headerChecksum, fmt.Sprintf("%d.%d.%d.%d", buf[12], buf[13], buf[14], buf[15]), fmt.Sprintf("%d.%d.%d.%d", buf[16], buf[17], buf[18], buf[19]))
+│%s│
+└───────────────────────────────────────┘`,
+		centerString(fmt.Sprintf("v%d", version), 4),
+		centerString(fmt.Sprintf("%d", ihl), 4),
+		centerString(fmt.Sprintf("%08b", buf[1]), 9),
+		centerString(fmt.Sprintf("%d", totalLength), 19),
+		centerString(fmt.Sprintf("%d", identification), 19),
+		centerString(fmt.Sprintf("%016b", uint16(buf[6])<<8|uint16(buf[7])), 19),
+		centerString(fmt.Sprintf("%08b", buf[8]), 9),
+		centerString(fmt.Sprintf("%s", protocol), 9),
+		centerString(fmt.Sprintf("%d", headerChecksum), 19),
+		centerString(fmt.Sprintf("%d.%d.%d.%d", buf[12], buf[13], buf[14], buf[15]), 39),
+		centerString(fmt.Sprintf("%d.%d.%d.%d", buf[16], buf[17], buf[18], buf[19]), 39))
 
 	return output, nil
 }
