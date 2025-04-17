@@ -2,13 +2,20 @@ package visualizer
 
 import "fmt"
 
-func IpDatagram(buf []byte) {
+func IPDatagramVersion(buf []byte) (uint8, error) {
+	if len(buf) < 20 {
+		return 0, fmt.Errorf("buffer too small")
+	}
+	return buf[0] >> 4, nil
+}
+
+func IPDatagram(buf []byte) {
 	// Check if the buffer is large enough to contain an IP header
 	if len(buf) < 20 {
 		return
 	}
 	// Version
-	version := int(buf[0] >> 4)
+	version, _ := IPDatagramVersion(buf)
 
 	// Extract the IP header length (IHL) from the first byte
 	ihl := int(buf[0] & 0x0F)

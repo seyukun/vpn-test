@@ -79,7 +79,7 @@ func main() {
 					continue
 				}
 				if n > 0 {
-					visualizer.IpDatagram(buf[:n])
+					visualizer.IPDatagram(buf[:n])
 					_, err = conn.WriteToUDP(buf[:n], remoteAddr)
 					if err != nil {
 						fmt.Println("Error sending to UDP:", err)
