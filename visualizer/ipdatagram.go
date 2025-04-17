@@ -90,7 +90,7 @@ func IPDatagramV6(buf []byte) (string, error) {
 	payloadLength := uint16(buf[4])<<8 | uint16(buf[5])
 
 	// Next Header
-	nextHaederNumber := int(buf[6])
+	nextHaederNumber := uint8(buf[6])
 	nextHaeder := fmt.Sprintf("??(%d)", nextHaederNumber)
 	switch nextHaederNumber {
 	case 0:
