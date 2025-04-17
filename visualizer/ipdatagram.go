@@ -359,7 +359,7 @@ func IPDatagramV4(buf []byte) (string, error) {
 ├────┴────┴─────────┼───────────────────┤
 │%s│%s│
 ├─────────┬─────────┼───────────────────┤
-│%s│%-9s│%s│
+│%s│%s│%s│
 ├─────────┴─────────┴───────────────────┤
 │%s│
 ├───────────────────────────────────────┤
@@ -402,14 +402,23 @@ func IPDatagramV6(buf []byte) (string, error) {
 
 	output := fmt.Sprintf(`
 ┌────┬─────────┬────────────────────────┐
-│v%-3d│%08b │%020d    │
+│%s│%s│%s│
 ├────┴─────────┴────┬─────────┬─────────┤
-│%-19d│%-9s|%-9d│
+│%s│%s|%s│
 ├───────────────────┴─────────┴─────────┤
-│%-39s│
+│%s│
 ├───────────────────────────────────────┤
-│%-39s│
-└───────────────────────────────────────┘`, version, trafficClass, flowLavel, payloadLength, nextHeader, hopLimit, net.IP(buf[8:24]), net.IP(buf[24:40]))
+│%s│
+└───────────────────────────────────────┘`,
+		centerString(fmt.Sprintf("v%d", version), 4),
+		centerString(fmt.Sprintf("%08b", trafficClass), 9),
+		centerString(fmt.Sprintf("%020d", flowLavel), 24),
+		centerString(fmt.Sprintf("%d", payloadLength), 19),
+		centerString(fmt.Sprintf("%s", nextHeader), 9),
+		centerString(fmt.Sprintf("%d", hopLimit), 9),
+		centerString(net.IP(buf[8:24]).String(), 39),
+		centerString(net.IP(buf[24:40]).String(), 39),
+	)
 
 	return output, nil
 }
