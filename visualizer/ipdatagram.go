@@ -90,3 +90,7 @@ func IPDatagram(buf []byte) {
 		fmt.Println("Unsupported IP version:", version)
 	}
 }
+
+func IPDatagramTUN(buf []byte) {
+	IPDatagram(buf[4:])
+}
