@@ -71,7 +71,7 @@ func IPDatagramV4(buf []byte) (string, error) {
 	output := fmt.Sprintf("┌────┬────┬─────────┬───────────────────┐\n")
 	output += fmt.Sprintf("│v%-3d│%-4d│%08b │%-19d│\n", version, ihl, buf[1], totalLength)
 	output += fmt.Sprintf("├────┴────┴─────────┼───────────────────┤\n")
-	output += fmt.Sprintf("│%-19d│%16b   │\n", identification, uint16(buf[6])<<8|uint16(buf[7]))
+	output += fmt.Sprintf("│%-19d│%016b   │\n", identification, uint16(buf[6])<<8|uint16(buf[7]))
 	output += fmt.Sprintf("├─────────┬─────────┼───────────────────┤\n")
 	output += fmt.Sprintf("│%08b │%-9s│%-19d│\n", buf[8], protocol, headerChecksum)
 	output += fmt.Sprintf("├─────────┴─────────┴───────────────────┤\n")
