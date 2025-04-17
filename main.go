@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	tun, err := createTUN("tun0", unix.IFF_TUN|unix.IFF_MULTI_QUEUE|unix.IFF_NAPI|unix.IFF_NO_PI)
+	tun, err := createTUN("tun0", unix.IFF_TUN|unix.IFF_MULTI_QUEUE|unix.IFF_NAPI)
 	if err != nil {
 		panic(err)
 	}
