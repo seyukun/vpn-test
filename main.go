@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/sys/unix"
 	"net"
 	"sync"
+	"vpn/visualizer"
+
+	"golang.org/x/sys/unix"
 )
 
 func main() {
@@ -77,6 +79,7 @@ func main() {
 					continue
 				}
 				if n > 0 {
+					visualizer.IpDatagram(buf[:n])
 					_, err = conn.WriteToUDP(buf[:n], remoteAddr)
 					if err != nil {
 						fmt.Println("Error sending to UDP:", err)
