@@ -91,7 +91,7 @@ func IPDatagramV6(buf []byte) (string, error) {
 
 	// Next Header
 	nextHaederNumber := int(buf[6])
-	nextHaeder := "Unknown"
+	nextHaeder := fmt.Sprintf("??(%d)", nextHaederNumber)
 	switch nextHaederNumber {
 	case 0:
 		nextHaeder = "Reserved"
