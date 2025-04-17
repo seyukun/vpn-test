@@ -9,13 +9,12 @@ func IPDatagramVersion(buf []byte) (uint8, error) {
 	return buf[0] >> 4, nil
 }
 
-func IPDatagram(buf []byte) {
-	// Check if the buffer is large enough to contain an IP header
-	if len(buf) < 20 {
-		return
-	}
+func IPDatagramV4(buf []byte) (string, error) {
 	// Version
-	version, _ := IPDatagramVersion(buf)
+	version, err := IPDatagramVersion(buf)
+	if err != nil {
+		return "", err
+	}
 
 	// Extract the IP header length (IHL) from the first byte
 	ihl := int(buf[0] & 0x0F)
@@ -25,7 +24,7 @@ func IPDatagram(buf []byte) {
 
 	// Check if the buffer is large enough to contain the entire IP datagram
 	if len(buf) < ipHeaderLength {
-		return
+		return "", fmt.Errorf("header too small")
 	}
 
 	// Total Length
@@ -60,13 +59,44 @@ func IPDatagram(buf []byte) {
 	}
 
 	// Print the source and destination IP addresses
-	fmt.Printf("VERSION: %d\n", version)
-	fmt.Printf("IHL: %d\n", ihl)
-	fmt.Printf("Total Length: %d\n", totalLength)
-	fmt.Printf("Identification: %d\n", identification)
-	fmt.Printf("TTL: %d\n", buf[8])
-	fmt.Printf("Protocol: %s\n", protocol)
-	fmt.Printf("Header Checksum: %d\n", headerChecksum)
-	fmt.Printf("SRC IP: %d.%d.%d.%d\n", int(buf[12]), int(buf[13]), int(buf[14]), int(buf[15]))
-	fmt.Printf("DST IP: %d.%d.%d.%d\n", buf[16], buf[17], buf[18], buf[19])
+	// fmt.Printf("VERSION: %d\n", version)
+	// fmt.Printf("IHL: %d\n", ihl)
+	// fmt.Printf("Total Length: %d\n", totalLength)
+	// fmt.Printf("Identification: %d\n", identification)
+	// fmt.Printf("TTL: %d\n", buf[8])
+	// fmt.Printf("Protocol: %s\n", protocol)
+	// fmt.Printf("Header Checksum: %d\n", headerChecksum)
+	// fmt.Printf("SRC IP: %d.%d.%d.%d\n", buf[12], buf[13], buf[14], buf[15])
+	// fmt.Printf("DST IP: %d.%d.%d.%d\n", buf[16], buf[17], buf[18], buf[19])
+	output := fmt.Sprintf("┌────┬────┬─────────┬───────────────────┐\n")
+	output += fmt.Sprintf("│v%-3d│%-4d│%08b │%-19d│\n", version, ihl, buf[1], totalLength)
+	output += fmt.Sprintf("├────┴────┴─────────┼───────────────────┤\n")
+	output += fmt.Sprintf("│%-19d│%16b   │\n", identification, buf[6:8])
+	output += fmt.Sprintf("├─────────┬─────────┼───────────────────┤\n")
+	output += fmt.Sprintf("│%08b │%-9s│%-19d│\n", buf[8], protocol, headerChecksum)
+	output += fmt.Sprintf("├─────────┴─────────┴───────────────────┤\n")
+	output += fmt.Sprintf("│src ip                                 │\n")
+	output += fmt.Sprintf("├───────────────────────────────────────┤\n")
+	output += fmt.Sprintf("│dst ip                                 │\n")
+	output += fmt.Sprintf("└───────────────────────────────────────┘\n")
+	return output, nil
+}
+
+func IPDatagram(buf []byte) {
+	// Version
+	version, err := IPDatagramVersion(buf)
+	if err != nil {
+		return
+	}
+
+	switch version {
+	case 4:
+		output, err := IPDatagramV4(buf)
+		if err != nil {
+			return
+		}
+		fmt.Println(output)
+	default:
+		fmt.Println("Unsupported IP version:", version)
+	}
 }
