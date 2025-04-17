@@ -48,7 +48,7 @@ func main() {
 				fmt.Println("Error reading from UDP:", err)
 				continue
 			}
-			fmt.Printf("Received %d bytes from %s: %s\n", n, addr, string(buf[:n]))
+			// fmt.Printf("Received %d bytes from %s: %s\n", n, addr, string(buf[:n]))
 			tun.Write(buf[:n])
 		}
 	}()
